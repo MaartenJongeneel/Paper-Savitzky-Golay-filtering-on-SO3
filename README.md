@@ -1,3 +1,3 @@
-# Savitzky Golay filtering on SO3
+# Savitzky-Golay-SO3
 
-This project contains the code associated to the paper "Geometric Savitzky-Golay Filter for Noisy Rotation Measurements on SO(3)". 
+This repository holds the code for the Savitzky-Golay filter on SO(3). 
