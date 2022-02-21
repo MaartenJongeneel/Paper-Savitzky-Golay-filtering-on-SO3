@@ -4,26 +4,26 @@ set(groot,'defaulttextinterpreter','latex'); set(groot,'defaultAxesTickLabelInte
 %% Constants and settings
 %User inputs
 doSave = false;     %Boolean: set true if you want to save figures
-doPlot = true;    %Determine if you want to plot the trajectory in 3D plot
-Fs = 1000;         %Sampling frequency fine grid     [Hz]
-Fc = 1;            %Signal frequency                 [Hz]
-a  = 2;            %Signal amplitude                 [deg]
-n  = 13;           %Window size SG-filter            [-]
-te = 10;           %Signal length                    [s]
-order = 4;         %Savitzky Golay filter order      [-]
-alpha = 5;         %Down-sampling rate               [-]
-Anoise = 0.02;     %Amplitude of noise
-Fo_G = [1;0;1];    %position of G w.r.t. F           [m]
-Go_E = [0;0;-0.4]; %position of E w.r.t. G           [m]
-GR_E = eye(3);     %rotation of E w.r.t. G           [rad]
+doPlot = false;    %Determine if you want to plot the trajectory in 3D plot
+Fs = 1000;         %Sampling frequency fine grid      [Hz]
+Fc = 1;            %Signal frequency                  [Hz]
+a  = 2;            %Signal amplitude                  [deg]
+n  = 13;           %Window size SG-filter             [-]
+te = 10;           %Signal length                     [s]
+order = 4;         %Savitzky Golay filter order       [-]
+alpha = 5;         %Down-sampling rate                [-]
+Anoise = 0.02;     %Standard deviation of added noise
+Fo_G = [1;0;1];    %position of G w.r.t. F            [m]
+Go_E = [0;0;-0.4]; %position of E w.r.t. G            [m]
+GR_E = eye(3);     %rotation of E w.r.t. G            [rad]
 
 %Computed values
-dt1 = 1/Fs;        %Time step                        [s]
-dt2 = alpha/Fs;    %Time step lower sampled          [s]
-t1 = (0:dt1:te);   %Signal time vector               [s]
-t2 = (0:dt2:te);   %Signal time vector lower sampled [s]
-N1 = length(t1);   %Number of samples                [-]
-N2 = length(t2);   %Number of samples lower sampled  [-]
+dt1 = 1/Fs;        %Time step                         [s]
+dt2 = alpha/Fs;    %Time step lower sampled           [s]
+t1 = (0:dt1:te);   %Signal time vector                [s]
+t2 = (0:dt2:te);   %Signal time vector lower sampled  [s]
+N1 = length(t1);   %Number of samples                 [-]
+N2 = length(t2);   %Number of samples lower sampled   [-]
 w = -n:n;          %Window for Golay
 I = eye(3);        %Short hand notation
 t3 = t2((n+1):(N2-(n+1)));       %Time vector filtered signal 
@@ -38,24 +38,28 @@ omg = NaN(3,N1);    omg_FD = NaN(3,N2);     est_omg = NaN(3,N2-length(w));
 domg = NaN(3,N1);   domg_FD = NaN(3,N2);    est_domg = NaN(3,N2-length(w));
 R = NaN(3,3,N1);    R_noise = NaN(3,3,N2);  est_R = NaN(3,3,N2-length(w));
 
-p = NaN(3,N1); dp = NaN(3,N1); ddp = NaN(3,N1); p_noise = NaN(3,N2);
+g = NaN(3,N1); dg = NaN(3,N1); ddg = NaN(3,N1); g_noise = NaN(3,N2);
 
 %% Creating data on SO(3)
-%Create a polynomial in R3 with first and second order derivative
-x0 = randn(3,1);
-x1 = randn(3,1);
-x2 = randn(3,1);
+%Create a random sine wave in R3 with first and second order derivative
+% x0 = randn(3,1);
+% x1 = randn(3,1);
+
+%Vectors below are created by randn(3,1) but placed here s.t. we can give
+%the values in the paper and show the corresponding plots
+x0 = [-0.4831; 0.6064; -2.6360];
+x1 = [ 0.9792; 1.4699; -0.4283];
 
 for ii = 1:N1
     freq= 2*pi*Fc;
-    p(:,ii) = x0 + x1*a*sin(freq*t1(ii));
-    dp(:,ii) = x1*a*(freq)*cos(freq*t1(ii));
-    ddp(:,ii) = -x1*a*(freq)^2*sin(freq*t1(ii));
+    g(:,ii) = x0 + x1*a*sin(freq*t1(ii)); %+ x2*a*sin(0.1*freq*t1(ii));
+    dg(:,ii) = x1*a*(freq)*cos(freq*t1(ii)); %+x2*a*0.1*freq*cos(0.1*freq*t1(ii));
+    ddg(:,ii) = -x1*a*(freq)^2*sin(freq*t1(ii)); %-x2*a*(0.1*freq)^2*sin(freq*t1(ii));
       
     %Compute analytically the rotation matrices, ang. vel., and ang. acc.
-    R(:,:,ii) = expSO3(p(:,ii));
-    omg(:,ii) = dexpSO3(p(:,ii))*dp(:,ii);
-    domg(:,ii) = DdexpSO3(p(:,ii),dp(:,ii))*dp(:,ii) +  dexpSO3(p(:,ii))*ddp(:,ii);
+    R(:,:,ii) = expSO3(g(:,ii));
+    omg(:,ii) = dexpSO3(g(:,ii))*dg(:,ii);
+    domg(:,ii) = DdexpSO3(g(:,ii),dg(:,ii))*dg(:,ii) +  dexpSO3(g(:,ii))*ddg(:,ii);
     
     %Create the homogeneous transformation matrices FH_E 
     Fo_E(:,ii)   = Fo_G(:,ii)+R(:,:,ii)*Go_E;
@@ -65,8 +69,8 @@ end
 %Noisy, lower sampled signal ("measurement")
 tel = 1;
 for ii = 1:alpha:N1
-p_noise(:,tel) = p(:,ii)+Anoise*randn(3,1);
-R_noise(:,:,tel) = expSO3(p_noise(:,tel));
+g_noise(:,tel) = g(:,ii)+Anoise*randn(3,1);
+R_noise(:,:,tel) = expSO3(g_noise(:,tel));
 tel=tel+1;
 end
 
@@ -99,10 +103,10 @@ for ii = (n+1):(N2-(n+1))
         b(row:row+length(I)-1,:) = vee(logm(R_noise(:,:,ii+w(jj))/R_noise(:,:,ii)));
         row = row+length(I); %Update to next row
     end
-    p_star = (A'*A)\A'*b; %Solve the LS problem
-    eta0 = p_star(1:3);
-    eta1 = p_star(4:6);
-    eta2 = p_star(7:9);
+    eta_hat = (A'*A)\A'*b; %Solve the LS problem
+    eta0 = eta_hat(1:3);
+    eta1 = eta_hat(4:6);
+    eta2 = eta_hat(7:9);
     
     %Compute analytically the rotation matrices, ang. vel., and ang. acc.
     est_R(:,:,cnt) = expSO3(eta0)*R_noise(:,:,ii);
@@ -123,6 +127,8 @@ for  ii = 1:length(px)
         pp{jj,ii} = [px(ii) py(jj)];
     end
 end
+
+tend = 2; %Define the end time to which we plot (tend should be smaller than te)
    
 %plot angular velocity (\omega_x)
 figure('rend','painters','pos',[pp{1,1} sizex sizey]);
@@ -144,26 +150,25 @@ figure('rend','painters','pos',[pp{1,1} sizex sizey]);
         print(fig,'figures/omg.pdf','-dpdf','-painters')
     end
     
-%plot angular velocity (\omega_x) close up
-figure('rend','painters','pos',[pp{1,2} sizex sizey]);
+%plot angular velocity (\omega_x)
+figure('rend','painters','pos',[pp{1,1} sizex sizey]);
     ha = tight_subplot(1,1,[.08 .07],[.18 .1],[0.12 0.03]);  %[gap_h gap_w] [lower upper] [left right]
     axes(ha(1));
     plot(t2,omg_FD(1,:)); hold on; grid on
     plot(t3,est_omg(1,:));
     plot(t1,omg(1,:)); 
-    xlim([1.05,1.55]);
-%     ylim([-12, 7]);
+    xlim([0,2]);
+%     ylim([-45,30]);
     xlabel('Time [s]');
     ylabel('Angular velocity [rad/s]');
-    legend('$(^F$\boldmath$\tilde{{\omega}}_{F,G})_x$','$(^F$\boldmath$\hat{{\omega}}_{F,G})_x$',...
-        '$(^F$\boldmath${{\omega}}_{F,G})_x$','location','southwest')
+    legend('$(^F$\boldmath$\tilde{{\omega}}_{F,G})_x$','$(^F$\boldmath$\hat{{\omega}}_{F,G})_x$','$(^F$\boldmath${{\omega}}_{F,G})_x$','location','southeast')
     if doSave
         fig = gcf;
         fig.PaperPositionMode = 'auto';
         fig_pos = fig.PaperPosition;
         fig.PaperSize = [fig_pos(3) fig_pos(4)];
-        print(fig,'figures/omg_zoom.pdf','-dpdf','-painters')
-    end
+        print(fig,'figures/omg.pdf','-dpdf','-painters')
+    end    
     
 %plot angular acceleration (\dot\omega_x)
 figure('rend','painters','pos',[pp{2,1} sizex sizey]);
@@ -347,3 +352,106 @@ figure('rend','painters','pos',[pp{3,1} 450 200]);
         print(fig,'figures/Rotation.pdf','-dpdf','-painters')
     end
     
+    
+%% Plot velocity in 1 plot
+% close all;
+%plot angular velocity (\omega_x)
+figure('rend','painters','pos',[pp{2,3} 2*sizex 0.8*sizey]);
+    ha = tight_subplot(1,3,[.05 .04],[.18 .26],[0.06 0.03]);  %[gap_h gap_w] [lower upper] [left right] 
+    axes(ha(1));
+    g1=plot(t2,omg_FD(1,:)); hold on; grid on
+    g2=plot(t3,est_omg(1,:));
+    g3=plot(t1,omg(1,:)); 
+    xlim([0,tend]);
+    xlabel('Time [s]');
+    ylabel('Angular velocity [rad/s]');
+    t=text(0.5,0.5,'x-component','parent',ha(1),'Fontsize',9); 
+    t.Position = [ha(1).XLim(1)+0.5*(abs(ha(1).XLim(1))+abs(ha(1).XLim(2)))-0.5*t.Extent(3) ha(1).YLim(1)+1.1*(abs(ha(1).YLim(1))+abs(ha(1).YLim(2)))];
+    
+    axes(ha(2));
+    plot(t2,omg_FD(2,:)); hold on; grid on
+    plot(t3,est_omg(2,:));
+    plot(t1,omg(2,:)); 
+    xlim([0,tend]);
+    xlabel('Time [s]');
+    t=text(0.5,0.5,'y-component','parent',ha(2),'Fontsize',9); 
+    t.Position = [ha(2).XLim(1)+0.5*(abs(ha(2).XLim(1))+abs(ha(2).XLim(2)))-0.5*t.Extent(3) ha(2).YLim(1)+1.1*(abs(ha(2).YLim(1))+abs(ha(2).YLim(2)))];
+    
+    axes(ha(3));
+    plot(t2,omg_FD(3,:)); hold on; grid on
+    plot(t3,est_omg(3,:));
+    plot(t1,omg(3,:)); 
+    xlim([0,tend]);
+    xlabel('Time [s]');
+    t=text(0.5,0.5,'z-component','parent',ha(3),'Fontsize',9); 
+    t.Position = [ha(3).XLim(1)+0.5*(abs(ha(3).XLim(1))+abs(ha(3).XLim(2)))-0.5*t.Extent(3) ha(3).YLim(1)+1.1*(abs(ha(3).YLim(1))+abs(ha(3).YLim(2)))];
+    
+    L1 = legend([g3 g1 g2],{'Analytical solution \boldmath${{\omega}}$','Finite differencing \boldmath$\breve{{\omega}}$',...
+        'Savitzky-Golay \boldmath$\hat{{\omega}}$'},'NumColumns',3,'location','northeast');
+    L1.Position(2) = 0.88;
+    L1.Position(1) = 0.5-(L1.Position(3)/2);
+    L1.FontSize = 9;    
+    
+    if doSave
+        fig = gcf;
+        fig.PaperPositionMode = 'auto';
+        fig_pos = fig.PaperPosition;
+        fig.PaperSize = [fig_pos(3) fig_pos(4)];
+        print(fig,'figures/omg.pdf','-dpdf','-painters')
+    end
+    
+%% Plot acceleration in 1 plot
+% close all;
+%plot angular acceleration (\omega_x)
+figure('rend','painters','pos',[pp{3,3} 2*sizex 0.8*sizey]);
+    ha = tight_subplot(1,3,[.05 .04],[.18 .26],[0.06 0.03]);  %[gap_h gap_w] [lower upper] [left right] 
+    axes(ha(1));
+    g1=plot(t2,domg_FD(1,:)); hold on; grid on
+    g2=plot(t3,est_domg(1,:));
+    g3=plot(t1,domg(1,:)); 
+    xlim([0,tend]);
+    ylim([-600,600]);
+    yticks([-600 -400 -200 0 200 400 600])
+    yticklabels({'-600','-400','-200','0','200','400','600'})
+    xlabel('Time [s]');
+    ylabel('Angular acceleration [rad/s$^2$]');
+    t=text(0.5,0.5,'x-component','parent',ha(1),'Fontsize',9); 
+    t.Position = [ha(1).XLim(1)+0.5*(abs(ha(1).XLim(1))+abs(ha(1).XLim(2)))-0.5*t.Extent(3) ha(1).YLim(1)+1.1*(abs(ha(1).YLim(1))+abs(ha(1).YLim(2)))];
+    
+    axes(ha(2));
+    plot(t2,domg_FD(2,:)); hold on; grid on
+    plot(t3,est_domg(2,:));
+    plot(t1,domg(2,:)); 
+    xlim([0,tend]);
+    ylim([-600,600]);
+    yticks([-600 -400 -200 0 200 400 600])
+    yticklabels({'-600','-400','-200','0','200','400','600'})
+    xlabel('Time [s]');
+    t=text(0.5,0.5,'y-component','parent',ha(2),'Fontsize',9); 
+    t.Position = [ha(2).XLim(1)+0.5*(abs(ha(2).XLim(1))+abs(ha(2).XLim(2)))-0.5*t.Extent(3) ha(2).YLim(1)+1.1*(abs(ha(2).YLim(1))+abs(ha(2).YLim(2)))];
+    
+    axes(ha(3));
+    plot(t2,domg_FD(3,:)); hold on; grid on
+    plot(t3,est_domg(3,:));
+    plot(t1,domg(3,:)); 
+    xlim([0,tend]);
+    ylim([-600,600]);
+    yticks([-600 -400 -200 0 200 400 600])
+    yticklabels({'-600','-400','-200','0','200','400','600'})
+    xlabel('Time [s]');
+    t=text(0.5,0.5,'z-component','parent',ha(3),'Fontsize',9); 
+    t.Position = [ha(3).XLim(1)+0.5*(abs(ha(3).XLim(1))+abs(ha(3).XLim(2)))-0.5*t.Extent(3) ha(3).YLim(1)+1.1*(abs(ha(3).YLim(1))+abs(ha(3).YLim(2)))];
+    
+    L1 = legend([g3 g1 g2],{'Analytical solution \boldmath$\dot{{\omega}}$','Finite differencing \boldmath$\breve{\dot{{\omega}}}$',...
+        'Savitzky-Golay \boldmath$\hat{\dot{{\omega}}}$'},'NumColumns',3,'location','northeast');
+    L1.Position(2) = 0.88;
+    L1.Position(1) = 0.5-(L1.Position(3)/2);
+    L1.FontSize = 9;    
+    
+    if doSave
+        fig = gcf;
+        fig.PaperPositionMode = 'auto';
+        fig_pos = fig.PaperPosition;
+        fig.PaperSize = [fig_pos(3) fig_pos(4)];
+        print(fig,'figures/domg.pdf','-dpdf','-painters')
+    end
