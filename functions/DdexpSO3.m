@@ -1,4 +1,11 @@
 function res = DdexpSO3(x,z)
+% Directional derivative of the dexp at x in the direction of z 
+%
+% INPUTS:    x       : 3-vector, element of so(3)
+%            z       : 3-vector, element of so(3)
+%
+% OUTPUTS:   res     : resulting derivative 
+%% Script
 hatx = hat(x);
 hatz = hat(z);
 phi = norm(x);
