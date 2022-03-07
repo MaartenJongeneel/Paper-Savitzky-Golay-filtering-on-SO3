@@ -142,6 +142,11 @@ mean_Edomg_FD = mean(Edomg_FD,'omitnan');
 mean_Edomg_est = mean(Edomg_est,'omitnan');
 
 %% Figures
+%Check if figures directory exists, if not, it will create one.
+if ~isfolder('figures')
+    mkdir('figures');
+end
+
 %Create a plot grid
 sizex = 380;
 sizey = 250;
