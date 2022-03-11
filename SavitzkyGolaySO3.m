@@ -4,14 +4,14 @@ set(groot,'defaulttextinterpreter','latex'); set(groot,'defaultAxesTickLabelInte
 %% Constants and settings
 %User inputs
 doSave = false;    %Boolean: set true if you want to save figures
-Fs = 1000;         %Sampling frequency fine grid      [Hz]
 Fc = 1;            %Signal frequency                  [Hz]
 a  = 2;            %Signal amplitude                  [deg]
-n  = 15;           %Window size SG-filter             [-]
 te = 2;            %Signal length                     [s]
-p = 2;             %Savitzky Golay filter order       [-]
-m = 5;             %Down-sampling rate                [-]
+Fs = 1000;         %Sampling frequency fine grid      [Hz]
+m  = 5;            %Down-sampling rate                [-]
 sigma = 0.06;      %Standard deviation of added noise [rad]
+n  = 15;           %Window size SG-filter             [-]
+p  = 2;            %Savitzky Golay filter order       [-]
 
 %Computed values
 dt1 = 1/Fs;        %Time step                         [s]
