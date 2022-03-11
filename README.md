@@ -4,7 +4,7 @@ Geometric Savitzky-Golay Filter for Noisy Rotation Measurements on SO(3), with D
 <div align="center">
 <h3>
 <a href="https://research.tue.nl/en/persons/maarten-jongeneel">Maarten Jongeneel</a>,
-<a href="https://www.tue.nl/en/research/researchers/alessandro-saccon/">Alessandro Saccon</a>
+<a href="https://research.tue.nl/en/persons/alessandro-saccon">Alessandro Saccon</a>
 <br>
 <br>
 IEEE/RSJ Intelligent Robots and Systems conference (IROS), 2022
