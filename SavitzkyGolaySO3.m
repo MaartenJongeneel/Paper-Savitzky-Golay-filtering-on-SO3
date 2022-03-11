@@ -20,14 +20,11 @@ t1 = (0:dt1:te);   %Signal time vector                [s]
 t2 = (0:dt2:te);   %Signal time vector lower sampled  [s]
 N1 = length(t1);   %Number of samples                 [-]
 N2 = length(t2);   %Number of samples lower sampled   [-]
-w = -n:n;          %Window for Golay
-I = eye(3);        %Short hand notation
-t3 = t2((n+1):(N2-(n+1)));       %Time vector filtered signal 
 
 %% Preallocate memory
-omg = NaN(3,N1);    omg_FD = NaN(3,N2);     omg_est = NaN(3,N2-length(w));
-domg = NaN(3,N1);   domg_FD = NaN(3,N2);    domg_est = NaN(3,N2-length(w));
-R = NaN(3,3,N1);    R_noise = NaN(3,3,N2);  R_est = NaN(3,3,N2-length(w));
+omg = NaN(3,N1);    omg_FD = NaN(3,N2);     
+domg = NaN(3,N1);   domg_FD = NaN(3,N2);    
+R = NaN(3,3,N1);    R_noise = NaN(3,3,N2);  
 
 phi = NaN(3,N1); dphi = NaN(3,N1); ddphi = NaN(3,N1); g_noise = NaN(3,N2);
 
@@ -68,47 +65,16 @@ for ii = 2:N2-1
     domg_FD(:,ii) = 1/(2*dt2)*(omg_FD(:,ii+1)-omg_FD(:,ii-1));
 end
 
-%% Savitzky-Golay
-%Now, from the noisy lower sampled data, we want to get back the correct
+%% ---------------- Applying the Savitzky-Golay filter ----------------- %%
+%Now, from the noisy lower sampled data, we want to get back the estimated
 %rotation matrix, angular velocity and angular acceleration
-
-%For each time step (where we can apply the window)
-cnt = 1;
-for ii = (n+1):(N2-(n+1))
-    %Build matrix A and vector b based on window size w
-    row = 1;
-    for jj = 1:length(w)
-        %Time difference between 0^th element and w(jj)^th element
-        Dt = (t2(ii+w(jj))-t2(ii)); 
-        %Determine row of A matrix
-        Ajj = I;
-        for kk = 1:p
-            Ajj = cat(2,Ajj,(1/kk)*Dt^kk*I); %concatenation based on SG filter order
-        end
-        A(row:row+length(I)-1,:) = Ajj;
-        b(row:row+length(I)-1,:) = vee(logm(R_noise(:,:,ii+w(jj))/R_noise(:,:,ii)));
-        row = row+length(I); %Update to next row
-    end
-    %Solve the LS problem
-    rho = (A'*A)\A'*b; 
-    
-    %Obtain the coefficients of rho
-    rho0 = rho(1:3);  rho1 = rho(4:6);  rho2 = rho(7:9);
-    
-    %Compute analytically the rotation matrices, ang. vel., and ang. acc.
-    R_est(:,:,cnt) = expSO3(rho0)*R_noise(:,:,ii);
-    omg_est(:,cnt) = dexpSO3(rho0)*rho1;
-    domg_est(:,cnt) = DdexpSO3(rho0,rho1)*rho1 +  dexpSO3(rho0)*rho2; 
-
-    %Update the index counter
-    cnt = cnt+1;
-end
+[R_est,omg_est,domg_est,t3] = sgolayfiltSO3(R_noise,p,n,1/dt2);
 
 %% ---------------- Computing errors, plotting results ----------------- %%
 %Time indices of R for which we have a measurement:
 close all;
 tR1 = find(ismember(t1,t2)==1);
-tR2 = find(ismember(t1,t3)==1);
+tR2 = find(ismember(single(t1),single(t3))==1);
 
 for ii = 1:length(tR1)
 eR_meas(:,:,ii) = logm(R(:,:,tR1(ii))\R_noise(:,:,ii));
