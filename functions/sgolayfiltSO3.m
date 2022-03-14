@@ -1,4 +1,4 @@
-function [R_est,omg_est,domg_est,t2] = sgolayfiltSO3(R,p,n,freq)
+function [R_est,omg_est,domg_est,tf] = sgolayfiltSO3(R,p,n,freq)
 % This function applies a Savitzky-Golay finite impulse response (FIR)
 % smoothing filter of polynomial order p and frame length n to the data in
 % the sequence of noisy rotation matrices R.
@@ -19,6 +19,7 @@ function [R_est,omg_est,domg_est,t2] = sgolayfiltSO3(R,p,n,freq)
 %            domg_est  :Estimated angular acceleration, specified as a
 %                       3-by-(N-(2n+1)) vector containing the estimated
 %                       angular accelerations at each time step.
+%            tf        :Time vector of the filtered signal
 %
 % M.J.Jongeneel, A.Saccon. Created 11-03-2022
 %% ---------------- Savitzky-Golay Filtering on SO(3) ----------------- %%
@@ -40,13 +41,13 @@ validateattributes(R,{'single','double'},...
     {'nonempty','real','3d','size',[3 3 NaN]})
 
 %% Computed values
-N = length(R(1,1,:));    %Number of samples in the sequence    [-]
-dt = 1/freq;             %Time step lower sampled              [s]
-te = N*dt;               %Total lenght of the sequence         [s]
-t = (0:dt:te);           %Signal time vector                   [s]
-w = -n:n;                %Window for Golay                     [-]
-I = eye(3);              %Short hand notation                  [-]
-t2 = t((n+1):(N-(n+1))); %Time vector filtered signal          [s]
+N = length(R(1,1,:));     %Number of samples in the sequence    [-]
+dt = 1/freq;              %Time step lower sampled              [s]
+te = N*dt;                %Total lenght of the sequence         [s]
+ts = (0:dt:te);           %Signal time vector                   [s]
+w = -n:n;                 %Window for Golay                     [-]
+I = eye(3);               %Short hand notation                  [-]
+tf = ts((n+1):(N-(n+1))); %Time vector filtered signal          [s]
 
 %% Preallocate memory
 R_est = NaN(3,3,N-length(w));
@@ -61,7 +62,7 @@ for ii = (n+1):(N-(n+1))
     row = 1;
     for jj = 1:length(w)
         %Time difference between 0^th element and w(jj)^th element
-        Dt = (t(ii+w(jj))-t(ii));
+        Dt = (ts(ii+w(jj))-ts(ii));
         %Determine row of A matrix
         Ajj = I;
         for kk = 1:p
