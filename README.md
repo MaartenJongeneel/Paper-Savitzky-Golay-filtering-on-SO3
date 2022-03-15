@@ -10,7 +10,7 @@ Geometric Savitzky-Golay Filter for Noisy Rotation Measurements on SO(3), with D
 IEEE/RSJ Intelligent Robots and Systems conference (IROS), 2022
 <br>
 <br>
-<a href="https://www.maartenjongeneel.nl">[Early Paper on HAL]</a>
+<a href="https://hal.archives-ouvertes.fr/hal-03603826v1">[Early Paper on HAL]</a>
 </h3>
 </div>
 
