@@ -17,7 +17,7 @@ IEEE/RSJ Intelligent Robots and Systems conference (IROS), 2022
 If you are using this paper as reference, please refer to it as
 ```bibtex
 @inproceedings{Jongeneel2022_GeometricSavitzky,
-    author = {M.J. Jongeneel and A. Saccon},
+    author = {M J Jongeneel and A Saccon},
     title = {{Geometric Savitzky-Golay Filtering of Noisy Rotations on SO(3) with Simultaneous Angular Velocity and Acceleration Estimation}},
     booktitle = {{IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2022)}},
     year = {2022},
