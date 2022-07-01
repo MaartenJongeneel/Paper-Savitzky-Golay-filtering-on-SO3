@@ -21,8 +21,7 @@ If you are using this paper as reference, please refer to it as
     title = {{Geometric Savitzky-Golay Filtering of Noisy Rotations on SO(3) with Simultaneous Angular Velocity and Acceleration Estimation}},
     booktitle = {{IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2022)}},
     year = {2022},
-    month = {October},
-    note = {Submitted}
+    month = {October}
 }
 ```
 
