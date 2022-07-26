@@ -3,15 +3,15 @@ set(groot,'defaulttextinterpreter','latex'); set(groot,'defaultAxesTickLabelInte
 %% ---------------- Savitzky-Golay Filtering on SO(3) ----------------- %%
 %% Constants and settings
 %User inputs
-doSave = false;    %Boolean: set true if you want to save figures
+doSave = true;    %Boolean: set true if you want to save figures
 Fc = 1;            %Signal frequency                  [Hz]
 a  = 2;            %Signal amplitude                  [deg]
 te = 2;            %Signal length                     [s]
 Fs = 1000;         %Sampling frequency fine grid      [Hz]
 m  = 5;            %Down-sampling rate                [-]
 sigma = 0.06;      %Standard deviation of added noise [rad]
-n  = 15;           %Window size SG-filter             [-]
-p  = 2;            %Savitzky Golay filter order       [-]
+n  = 20;           %Window size SG-filter             [-]
+p  = 3;            %Savitzky Golay filter order       [-]
 
 %Computed values
 dt1 = 1/Fs;        %Time step                         [s]
@@ -53,7 +53,8 @@ end
 %Noisy, lower sampled signal ("measurement")
 cnt = 1;
 for ii = 1:m:N1
-R_noise(:,:,cnt) = expSO3(phi(:,ii)+sigma*randn(3,1));
+% R_noise(:,:,cnt) = expSO3(phi(:,ii)+sigma*randn(3,1));
+R_noise(:,:,cnt) = expSO3(sigma*randn(3,1))*R(:,:,ii);
 cnt=cnt+1;
 end
 
@@ -77,14 +78,14 @@ tR1 = find(ismember(t1,t2)==1);
 tR2 = find(ismember(single(t1),single(t3))==1);
 
 for ii = 1:length(tR1)
-eR_meas(:,:,ii) = logm(R(:,:,tR1(ii))\R_noise(:,:,ii));
+eR_meas(:,:,ii) = logm(R(:,:,tR1(ii))/R_noise(:,:,ii));
 NeR_meas(ii) = norm(eR_meas(:,:,ii));
 eomg_FD(:,ii) = omg_FD(:,ii)-omg(:,tR1(ii));
 edomg_FD(:,ii) = domg_FD(:,ii)-domg(:,tR1(ii)); 
 end
 
 for ii = 1:length(tR2)
-eR_est(:,:,ii) = logm(R(:,:,tR2(ii))\R_est(:,:,ii));
+eR_est(:,:,ii) = logm(R(:,:,tR2(ii))/R_est(:,:,ii));
 NeR_est(ii) = norm(eR_est(:,:,ii));
 eomg_est(:,ii) = omg_est(:,ii)-omg(:,tR2(ii));
 edomg_est(:,ii) = domg_est(:,ii)-domg(:,tR2(ii));
@@ -99,13 +100,22 @@ Edomg_est = vecnorm(edomg_est);
 mean_ER_est = mean(NeR_est);
 mean_ER_meas = mean(NeR_meas);
 
+disp(['Mean rotation error measured: ',num2str(mean_ER_meas),'rad'])
+disp(['Mean rotation error SG-estimate: ',num2str(mean_ER_est),'rad'])
+
 %Mean errors in velocity
 mean_Eomg_FD = mean(Eomg_FD,'omitnan');
 mean_Eomg_est = mean(Eomg_est,'omitnan');
 
+disp(['Mean velocity error finite differencing: ',num2str(mean_Eomg_FD),'rad/s'])
+disp(['Mean velocity error SG-estimate: ',num2str(mean_Eomg_est),'rad/s'])
+
 %Mean errors in acceleration
 mean_Edomg_FD = mean(Edomg_FD,'omitnan');
 mean_Edomg_est = mean(Edomg_est,'omitnan');
+
+disp(['Mean acceleration error finite differencing: ',num2str(mean_Edomg_FD),'rad/s^2'])
+disp(['Mean accelration error SG-estimate: ',num2str(mean_Edomg_est),'rad/s^2'])
 
 %% Figures
 %Check if figures directory exists, if not, it will create one.
@@ -264,9 +274,9 @@ figure('rend','painters','pos',[pp{3,1} 2*sizex 0.8*sizey]);
     g2=plot(t3,domg_est(1,:),'linewidth',1.5);
     g3=plot(t1,domg(1,:),'linewidth',1.5); 
     xlim([0,te]);
-    ylim([-150,150]);
-    yticks([-150 -100 -50 0 50 100 150])
-    yticklabels({'-150','-100','-50','0','50','100','150'})
+    ylim([-200,200]);
+    yticks([-200 -150 -100 -50 0 50 100 150 200])
+    yticklabels({'-200','-150','-100','-50','0','50','100','150','200'})
     xlabel('Time [s]');
     ylabel('Angular acceleration [rad/s$^2$]');
     t=text(0.5,0.5,'x-component','parent',ha(1),'Fontsize',9); 
@@ -277,9 +287,9 @@ figure('rend','painters','pos',[pp{3,1} 2*sizex 0.8*sizey]);
     plot(t3,domg_est(2,:),'linewidth',1.5);
     plot(t1,domg(2,:),'linewidth',1.5); 
     xlim([0,te]);
-    ylim([-300,300]);
-    yticks([-300 -200 -100 0 100 200 300])
-    yticklabels({'-300','-200','-100','0','100','200','300'})
+    ylim([-200,200]);
+    yticks([-200 -150 -100 -50 0 50 100 150 200])
+    yticklabels({'-200','-150','-100','-50','0','50','100','150','200'})
     xlabel('Time [s]');
     t=text(0.5,0.5,'y-component','parent',ha(2),'Fontsize',9); 
     t.Position = [ha(2).XLim(1)+0.5*(abs(ha(2).XLim(1))+abs(ha(2).XLim(2)))-0.5*t.Extent(3) ha(2).YLim(1)+1.1*(abs(ha(2).YLim(1))+abs(ha(2).YLim(2)))];
@@ -289,9 +299,9 @@ figure('rend','painters','pos',[pp{3,1} 2*sizex 0.8*sizey]);
     plot(t3,domg_est(3,:),'linewidth',1.5);
     plot(t1,domg(3,:),'linewidth',1.5); 
     xlim([0,te]);
-    ylim([-300,300]);
-    yticks([-300 -200 -100 0 100 200 300])
-    yticklabels({'-300','-200','-100','0','100','200','300'})
+    ylim([-200,200]);
+    yticks([-200 -150 -100 -50 0 50 100 150 200])
+    yticklabels({'-200','-150','-100','-50','0','50','100','150','200'})
     xlabel('Time [s]');
     t=text(0.5,0.5,'z-component','parent',ha(3),'Fontsize',9); 
     t.Position = [ha(3).XLim(1)+0.5*(abs(ha(3).XLim(1))+abs(ha(3).XLim(2)))-0.5*t.Extent(3) ha(3).YLim(1)+1.1*(abs(ha(3).YLim(1))+abs(ha(3).YLim(2)))];
