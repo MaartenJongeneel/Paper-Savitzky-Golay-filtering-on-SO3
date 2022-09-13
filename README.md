@@ -83,4 +83,4 @@ It returns the following outputs:
 %            tf        :Time vector of the filtered signal
 ```
 # Contact
-In case you have questions or if you encountered an error, please contact us through the "Issues" functionality on GIT. Alternatively, you can send an email to <a href="mailto:m.j.jongeneel@tue.nl">Maarten Jongeneel</a>.
+In case you have questions or if you encountered an error, please contact us through the "Issues" functionality on GIT. Alternatively, you can send an email to <a href="mailto:m.j.jongeneel@tue.nl">Maarten Jongeneel</a> and/or <a href="mailto:a.saccon@tue.nl">Alessandro Saccon</a>.
