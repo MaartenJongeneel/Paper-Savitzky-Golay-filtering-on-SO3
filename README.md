@@ -47,7 +47,7 @@ The code of this repository is all written in MATLAB and can directly be pulled 
 ## Main script to reproduce paper results
 The main script of this repository, ``SavitzkyGolaySO3.m``, is used to demonstrate the effectiveness of the filter and to create the figures as shown in the paper. In this script, one can change the following parameters:
 
-```matlab
+```Matlab
 Fc = 1;            %Signal frequency                  [Hz]
 a  = 2;            %Signal amplitude                  [deg]
 te = 2;            %Signal length                     [s]
@@ -61,7 +61,7 @@ Where `Fc`, `a`, and `te` define the original signal frequency, amplitude, and l
 
 ## Filter script to apply on own data
 The `Functions` folder contains all the functions used in the main script. The most important function here is `sgolayfiltSO3.m`. This script is the main script of the filter and can be directly applied on a sequence of noisy rotation matrices. This script uses the following parameters:
-```matlab
+```Matlab
 % INPUTS:    R         :Noisy sequence of rotation matrices, specified as
 %                       a 3-by-3-by-N matrix containing N rotation matrices
 %            p         :Polynomial order, specified as a positive integer,
@@ -70,7 +70,7 @@ The `Functions` folder contains all the functions used in the main script. The m
 %            freq      :Sample frequency, specified as positive integer.
 ```
 It returns the following outputs:
-```matlab
+```Matlab
 % OUTPUTS:   R_est     :Estimated rotation matrices, specified as a
 %                       3-by-3-by-(N-(2n+1)) matrix containing the
 %                       estimated rotation matrices.
