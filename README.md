@@ -1,7 +1,7 @@
+<div align="center">
 <h1 align="center">
 Geometric Savitzky-Golay Filter for Noisy Rotation Measurements on SO(3), with Direct Angular Velocity and Acceleration Estimations
 </h1>
-<div align="center">
 <h3>
 <a href="https://research.tue.nl/en/persons/maarten-jongeneel">Maarten Jongeneel</a>,
 <a href="https://research.tue.nl/en/persons/alessandro-saccon">Alessandro Saccon</a>
