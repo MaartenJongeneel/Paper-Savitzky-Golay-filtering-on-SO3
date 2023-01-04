@@ -10,6 +10,9 @@ Geometric Savitzky-Golay Filter for Noisy Rotation Measurements on SO(3), with D
 IEEE/RSJ Intelligent Robots and Systems conference (IROS), 2022
 <br>
 <br>
+<a href="https://ieeexplore.ieee.org/document/9981409">[Published paper on IEEE]</a>
+<br>
+<br>
 <a href="https://hal.archives-ouvertes.fr/hal-03603826v1">[Early Paper on HAL]</a>
 </h3>
 </div>
@@ -21,7 +24,9 @@ If you are using this paper as reference, please refer to it as
     title = {{Geometric Savitzky-Golay Filtering of Noisy Rotations on SO(3) with Simultaneous Angular Velocity and Acceleration Estimation}},
     booktitle = {{IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2022)}},
     year = {2022},
-    month = {October}
+    month = {October},
+    pages = {2962-2968},
+    doi = {https://doi.org/10.1109/IROS47612.2022.9981409}
 }
 ```
 
