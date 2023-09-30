@@ -3,7 +3,7 @@ set(groot,'defaulttextinterpreter','latex'); set(groot,'defaultAxesTickLabelInte
 %% ---------------- Savitzky-Golay Filtering on SO(3) ----------------- %%
 %% Constants and settings
 %User inputs
-doSave = true;    %Boolean: set true if you want to save figures
+doSave = false;    %Boolean: set true if you want to save figures
 Fc = 1;            %Signal frequency                  [Hz]
 a  = 2;            %Signal amplitude                  [deg]
 te = 2;            %Signal length                     [s]
