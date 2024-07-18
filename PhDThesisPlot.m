@@ -106,8 +106,8 @@ figure('rend','painters','pos',[pp{1,2} 450 200]);
     
     
 %% Plot velocity in 1 plot
-figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
-    ha = tight_subplot(3,1,[.03 .05],[.075 .02],[0.13 0.01]);  %[gap_h gap_w] [lower upper] [left right] 
+figure('rend','painters','unit','centimeters','pos',[0.238125,16.51,10,12]);
+    ha = tight_subplot(3,1,[.03 .05],[.085 .02],[0.13 0.01]);  %[gap_h gap_w] [lower upper] [left right] 
     axes(ha(1));
     g1=plot(t2,omg_FD(1,:),'color',[0 0.4470 0.7410 0.6]); hold on; grid on
     g2=plot(t3,omg_est(1,:),'linewidth',1.5);
@@ -118,7 +118,7 @@ figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
     ylim([-20 20]);
     yticks([-20 -10 0 10 20]);
     yticklabels({'-20','-10','0','10','20'});
-    ylabel({'Angular velocity [rad/s]';'x-component'});
+    ylabel({'x-component [rad/s]'});
     
     axes(ha(2));
     plot(t2,omg_FD(2,:),'color',[0 0.4470 0.7410 0.6]); hold on; grid on
@@ -130,7 +130,7 @@ figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
     ylim([-20 20]);
     yticks([-20 -10 0 10 20]);
     yticklabels({'-20','-10','0','10','20'});
-    ylabel({'Angular velocity [rad/s]';'y-component'});
+    ylabel({'y-component [rad/s]'});
     
     axes(ha(3));
     plot(t2,omg_FD(3,:),'color',[0 0.4470 0.7410 0.6]); hold on; grid on
@@ -142,7 +142,7 @@ figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
     ylim([-20 20]);
     yticks([-20 -10 0 10 20]);
     yticklabels({'-20','-10','0','10','20'});
-    ylabel({'Angular velocity [rad/s]';'z-component'});
+    ylabel({'z-component [rad/s]'});
     xlabel('Time [s]');  
     set(findall(gcf,'-property','FontSize'),'FontSize',10)
     
@@ -155,8 +155,8 @@ figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
     end
     
 %% Plot acceleration in 1 plot
-figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
-    ha = tight_subplot(3,1,[.03 .05],[.075 .02],[0.14 0.01]);  %[gap_h gap_w] [lower upper] [left right] 
+figure('rend','painters','unit','centimeters','pos',[0.238125,16.51,10,12]);
+    ha = tight_subplot(3,1,[.03 .05],[.085 .02],[0.14 0.01]);   %[gap_h gap_w] [lower upper] [left right] 
     axes(ha(1));
     g1=plot(t2,domg_FD(1,:),'color',[0 0.4470 0.7410 0.6]); hold on; grid on
     g2=plot(t3,domg_est(1,:),'linewidth',1.5);
@@ -165,7 +165,7 @@ figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
     ylim([-200,200]);
     yticks([-200 -150 -100 -50 0 50 100 150 200])
     yticklabels({'-200','-150','-100','-50','0','50','100','150','200'})
-    ylabel({'Ang. acceleration [rad/s$^2$]';'x-component'});
+    ylabel({'x-component [rad/s$^2$]'});
     xticks([0 0.5 1 1.5 2]);
     xticklabels({'','','','',''});
     
@@ -177,7 +177,7 @@ figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
     ylim([-200,200]);
     yticks([-200 -150 -100 -50 0 50 100 150 200])
     yticklabels({'-200','-150','-100','-50','0','50','100','150','200'})
-    ylabel({'Ang. acceleration [rad/s$^2$]';'y-component'});
+    ylabel({'y-component [rad/s$^2$]'});
     xticks([0 0.5 1 1.5 2]);
     xticklabels({'','','','',''});
 
@@ -189,7 +189,7 @@ figure('rend','painters','pos',[pp{3,1} sizex 2.1*sizey]);
     ylim([-200,200]);
     yticks([-200 -150 -100 -50 0 50 100 150 200])
     yticklabels({'-200','-150','-100','-50','0','50','100','150','200'})
-    ylabel({'Ang. acceleration [rad/s$^2$]';'z-component'});
+    ylabel({'z-component [rad/s$^2$]'});
     xticks([0 0.5 1 1.5 2]);
     xticklabels({'0','0.5','1','1.5','2'});
     xlabel('Time [s]');  
